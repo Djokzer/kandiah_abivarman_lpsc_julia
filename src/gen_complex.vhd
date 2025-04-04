@@ -81,8 +81,8 @@ begin
 		variable real_val : integer;
 		variable imag_val : integer;
 	begin
-		real_val := RE_MIN + x_coord * STEP_HORI;
-		imag_val := IM_MIN + y_coord * STEP_VERT;
+		real_val := (RE_MIN * 2**FIXED_BITS) + (x_coord * STEP_HORI);
+		imag_val := (IM_MIN * 2**FIXED_BITS) + (y_coord * STEP_VERT);
 
 		c_re <= std_logic_vector(to_signed(real_val, c_re'length));
 		c_im <= std_logic_vector(to_signed(imag_val, c_im'length));
