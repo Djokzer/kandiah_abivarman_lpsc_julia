@@ -35,8 +35,8 @@ architecture rtl of gen_complex_coord is
 	constant RE_RANGE	: integer := RE_MAX - RE_MIN;
 	constant IM_RANGE	: integer := IM_MAX - IM_MIN;
 
-	constant STEP_HORI : integer := integer(RE_RANGE * 2**FIXED_BITS / X_SIZE-1);
-	constant STEP_VERT : integer := integer(IM_RANGE * 2**FIXED_BITS / Y_SIZE-1);
+	constant STEP_HORI : integer := integer((RE_RANGE * 2**FIXED_BITS) / (X_SIZE-1));
+	constant STEP_VERT : integer := integer((IM_RANGE * 2**FIXED_BITS) / (Y_SIZE-1));
 	
 	-- COORDINATES COUNTER
 	signal x_coord : integer := 0;
@@ -81,8 +81,8 @@ begin
 		variable real_val : integer;
 		variable imag_val : integer;
 	begin
-		real_val := X_SIZE + x_coord * STEP_HORI;
-		imag_val := Y_SIZE + y_coord * STEP_VERT;
+		real_val := RE_MIN + x_coord * STEP_HORI;
+		imag_val := IM_MIN + y_coord * STEP_VERT;
 
 		c_re <= std_logic_vector(to_signed(real_val, c_re'length));
 		c_im <= std_logic_vector(to_signed(imag_val, c_im'length));
