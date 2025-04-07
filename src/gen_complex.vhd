@@ -23,9 +23,9 @@ entity gen_complex_coord is
 		clk			: in std_logic;
 		rst			: in std_logic;
 
-		-- COMPLEX
-		c_re    	: out std_logic_vector(31 downto 0);
-		c_im    	: out std_logic_vector(31 downto 0)
+		-- COMPLEX COORDINATE
+		z_re    	: out std_logic_vector(31 downto 0);
+		z_im    	: out std_logic_vector(31 downto 0)
 	);
 end entity gen_complex_coord;
 
@@ -84,8 +84,8 @@ begin
 		real_val := (RE_MIN * 2**FIXED_BITS) + (x_coord * STEP_HORI);
 		imag_val := (IM_MIN * 2**FIXED_BITS) + (y_coord * STEP_VERT);
 
-		c_re <= std_logic_vector(to_signed(real_val, c_re'length));
-		c_im <= std_logic_vector(to_signed(imag_val, c_im'length));
+		z_re <= std_logic_vector(to_signed(real_val, z_re'length));
+		z_im <= std_logic_vector(to_signed(imag_val, z_im'length));
 	end process;
 
 end architecture;
