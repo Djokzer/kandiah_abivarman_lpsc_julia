@@ -42,8 +42,17 @@ def fixed_mul(a, b):
 def save_complex_coord():
 	pass
 
-def load_complex_coord():
-	pass
+def load_complex_coord(filename):
+	c_array = np.zeros((Y_SIZE, X_SIZE), dtype=[('x', 'int'), ('y', 'int')])
+	lines = []
+	with open(filename) as f:
+		lines = np.array([line.strip().split(',') for line in f.readlines()]).astype(int)
+	
+	for y in range(Y_SIZE):
+		for x in range(X_SIZE):
+			c_array[y, x] = (lines[x + y * X_SIZE][0], lines[x + y * X_SIZE][1])
+	
+	return c_array
 
 # JULIA FRACTAL COMPUTING FUNCTIONS
 def gen_complex_coord():
@@ -91,7 +100,8 @@ def julia_compute(c_array):
 
 	return julia
 
-if __name__ == "__main__":
+# JULIA PYTHON TESTING
+def test_fixed_julia():
 	# COMPUTE JULIA FRACTAL
 	c = gen_complex_coord()
 	div = julia_compute(c)
@@ -102,3 +112,33 @@ if __name__ == "__main__":
 	plt.title(f"Fixed-Point Julia Set")
 	plt.axis('off')
 	plt.show()
+
+# VHDL TESTING FUNCTION
+def test_gen_complex_coord():
+	# GENERATE COMPLEX COORDINATE WITH PYTHON
+	c = gen_complex_coord()
+	div_py = julia_compute(c)
+	
+	# GENERATE COMPLEX COORDINATE WITH VHDL
+	c = load_complex_coord("output/complex_output.csv")
+	div_vhdl = julia_compute(c)
+
+	# PLOT BOTH IMAGES SIDE BY SIDE
+	fig, axs = plt.subplots(1, 2, figsize=(12, 6))
+
+	axs[0].imshow(div_py, cmap='cubehelix', extent=(RE_MIN, RE_MAX, IM_MIN, IM_MAX))
+	axs[0].set_title("Python Computation")
+	axs[0].axis('off')
+
+	axs[1].imshow(div_vhdl, cmap='cubehelix', extent=(RE_MIN, RE_MAX, IM_MIN, IM_MAX))
+	axs[1].set_title("VHDL Output Comparison")
+	axs[1].axis('off')
+
+	plt.tight_layout()
+	plt.show()
+
+
+
+if __name__ == "__main__":
+	#test_fixed_julia()
+	test_gen_complex_coord()
