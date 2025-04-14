@@ -6,7 +6,7 @@ use ieee.math_real.all;
 entity julia_compute is
     generic(
         -- FIXED POINT  
-		FIXED_BITS	: integer := 20;
+		FIXED_BITS	    : integer := 20;
 
         -- COMPLEX CONST
         c_re            : integer := 298844;    -- Real = 0.285, with Fixed bits = 0.285 * 2**20
@@ -22,8 +22,9 @@ entity julia_compute is
 		z_im            : in std_logic_vector(31 downto 0);
 
         -- JULIA OUTPUT
-        is_in_julia     : out std_logic;
-        escape_counter  : out std_logic_vector(7 downto 0) 
+        escape_counter  : out std_logic_vector(7 downto 0); -- When counter = 100, Z is in julia set
+        address         : out std_logic_vector(31 downto 0);
+        valid           : out std_logic
     );
 end entity julia_compute;
 
