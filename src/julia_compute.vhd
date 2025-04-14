@@ -5,6 +5,10 @@ use ieee.math_real.all;
 
 entity julia_compute is
     generic(
+        -- SCREEN SIZE
+		X_SIZE		: integer := 10;
+		Y_SIZE 		: integer := 10;
+
         -- FIXED POINT  
 		FIXED_BITS	    : integer := 20;
 
@@ -15,7 +19,7 @@ entity julia_compute is
     port (
         -- GENERAL
         clk             : in std_logic;
-        reset           : in std_logic;
+        rst             : in std_logic;
         
         -- COMPLEX POINT
 		z_re            : in std_logic_vector(31 downto 0);
@@ -29,9 +33,10 @@ entity julia_compute is
 end entity julia_compute;
 
 architecture rtl of julia_compute is
-
+    -- COORDINATES COUNTER
+	signal x_coord : integer := 0;
+	signal y_coord : integer := 0;
 begin
 
-    
 
 end architecture;

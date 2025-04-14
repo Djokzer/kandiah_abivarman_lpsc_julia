@@ -6,10 +6,10 @@ library std;
 use std.textio.all;
 use std.env.finish;
 
-entity gen_complex_coord_tb is
+entity coord_to_complex_tb is
 end;
 
-architecture testbench of gen_complex_coord_tb is
+architecture testbench of coord_to_complex_tb is
 	-- CONSTANTS
 	-- Clock period
 	constant clk_period : time := 5 ns;
@@ -23,12 +23,17 @@ architecture testbench of gen_complex_coord_tb is
 	constant FIXED_BITS : integer := 20;
 
 	-- SIGNALS
-	-- DUT Ports
+	-- UUT Ports
 	signal clk : std_logic := '0';
 	signal rst : std_logic;
 	signal z_re : std_logic_vector(31 downto 0);
 	signal z_im : std_logic_vector(31 downto 0);
+	signal x_coord : std_logic_vector(15 downto 0);
+	signal y_coord : std_logic_vector(15 downto 0);
 	
+	-- X,Y COORDINATES COUNTER
+	signal x,y : integer := 0;
+
 	-- File for output
 	file output_file : text open write_mode is "/home/abi/Documents/other/master/fpga_julia/output/complex_output.csv";
 begin
@@ -36,8 +41,8 @@ begin
 	clk <= not clk after clk_period/2;
 	rst <= '1', '0'  after CLK_PERIOD * 10;
 	
-	-- DEVICE UNDER TEST
-	dut : entity work.gen_complex_coord
+	-- UNIT UNDER TEST
+	uut : entity work.coord_to_complex
 	generic map (
 		X_SIZE => X_SIZE,
 		Y_SIZE => Y_SIZE,
@@ -48,11 +53,48 @@ begin
 		FIXED_BITS => FIXED_BITS
 	)
 	port map (
-		clk => clk,
-		rst => rst,
+		x_coord => x_coord,
+		y_coord => y_coord,
 		z_re => z_re,
 		z_im => z_im
 	);
+
+	-- COUNT X COORDINATE FROM 0 TO X_SIZE-1
+	x_counter : process(clk, rst)
+	begin
+		if rising_edge(clk) then
+			if rst = '1' then
+				x <= 0;
+			else
+				if x = (X_SIZE-1) then
+					x <= 0;
+				else
+					x <= x + 1;
+				end if;
+			end if;
+		end if;
+	end process;
+
+	-- COUNT Y COORDINATE FROM 0 TO Y_SIZE-1
+	-- WHEN X FINISHED A LOOP
+	y_counter : process(clk, rst)
+	begin
+		if rising_edge(clk) then
+			if rst = '1' then
+				y <= 0;
+			else
+				if y = (Y_SIZE-1) then
+					y <= 0;
+				elsif x = (X_SIZE-1) then
+					y <= y + 1;
+				end if;
+			end if;
+		end if;
+	end process;
+	
+	-- MAP X,Y COUNTER TO DUT INPUT
+	x_coord <= std_logic_vector(to_signed(x, x_coord'length));
+	y_coord <= std_logic_vector(to_signed(y, y_coord'length));
 
 	-- OUTPUT COMPLEX COORD IN A FILE
 	stimuli : process
