@@ -14,8 +14,8 @@ architecture testbench of julia_compute_tb is
 	constant clk_period : time := 5 ns;
 
 	-- Generics
-	constant X_SIZE      : integer := 100;
-	constant Y_SIZE      : integer := 100;
+	constant X_SIZE      : integer := 1000;
+	constant Y_SIZE      : integer := 1000;
 	constant RE_MIN      : integer := -2;
 	constant RE_MAX      : integer := 2;
 	constant IM_MIN      : integer := -2;
@@ -38,7 +38,7 @@ architecture testbench of julia_compute_tb is
 	signal finished       : boolean := false;
 
 	-- FILE OUTPUT
-	file output_file : text open write_mode is "julia_output.csv";
+	file output_file : text open write_mode is "/home/abi/Documents/other/master/fpga_julia/output/julia_output.csv";
 
 begin
 	-- CLOCK AND RESET CONTROL
@@ -81,7 +81,6 @@ begin
 
 				if address = std_logic_vector(to_unsigned(X_SIZE * Y_SIZE - 1, 32)) then
 					report "-- All pixels written --";
-					wait for clk_period * 10;
 					finish;
 				end if;
 			end if;

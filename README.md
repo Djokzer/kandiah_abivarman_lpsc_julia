@@ -1,3 +1,4 @@
 # JULIA SET
 
-![](assets/diagram.png)
+![](assets/vhdl_python_compare.png)
+

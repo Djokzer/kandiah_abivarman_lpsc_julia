@@ -40,7 +40,7 @@ end entity julia_compute;
 
 architecture rtl of julia_compute is
 	-- CONSTANTS
-	constant FIXED_THRESHOLD : integer := (THRESHOLD**2) * 2**FIXED_BITS;
+	constant FIXED_THRESHOLD : integer := ((THRESHOLD * 2**FIXED_BITS)**2) / 2**FIXED_BITS;
 
 	-- X,Y COORDINATES COUNTER
 	signal x_coord			: std_logic_vector(15 downto 0);
@@ -102,11 +102,12 @@ begin
 				next_fsm_state <= JULIA_COMP;
 
 			when JULIA_COMP =>
-				julia_enable <= '1';
 				if julia_count < ITERATIONS then
 					if z_norm > FIXED_THRESHOLD then
 						-- Z ESCAPED
 						next_fsm_state <= JULIA_OUTPUT;
+					else
+					   julia_enable <= '1';
 					end if;
 				else
 					-- Z IS IN JULIA SET
@@ -163,11 +164,20 @@ begin
 	end process;
 
 	julia_iter : process(z_re_n, z_im_n)
-		variable z_re_sq, z_im_sq, xy : integer;
+        variable z_re_sq, z_im_sq, xy : integer;
+        variable z_re_mult, z_im_mult, xy_mult : signed(63 downto 0);
 	begin
-		z_re_sq := to_integer(shift_right(to_signed(z_re_n * z_re_n, 32), FIXED_BITS));		-- z_re^2
-		z_im_sq := to_integer(shift_right(to_signed(z_im_n * z_im_n, 32), FIXED_BITS));		-- z_im^2
-		xy 		:= to_integer(shift_right(to_signed(z_re_n * z_im_n, 32), FIXED_BITS - 1)); -- 2 * z_re * z_im
+        -- Z_RE_N+1 = Z_RE_N^2
+        z_re_mult := to_signed(z_re_n, 32) * to_signed(z_re_n, 32);
+        z_re_sq := to_integer(z_re_mult srl FIXED_BITS);
+    
+        -- Z_IM_N+1 = Z_IM_N^2
+        z_im_mult := to_signed(z_im_n, 32) * to_signed(z_im_n, 32);
+        z_im_sq := to_integer(z_im_mult srl FIXED_BITS);
+    
+        -- 2 * Z_RE * Z_IM
+		xy_mult := to_signed(z_re_n, 32) * to_signed(z_im_n, 32);
+        xy := to_integer(xy_mult srl (FIXED_BITS - 1));
 
 		z_re_n1 <= z_re_sq - z_im_sq + c_re;	-- z_re_n+1 = z_re^2 - z_im^2 + C_RE 
 		z_im_n1 <= xy + c_im;					-- z_im_n+1 = 2 * z_re * z_im + C_IM
@@ -203,7 +213,7 @@ begin
 				y_count <= 0;
 			else
 				if count_enable = '1' then
-					if y_count = (Y_SIZE-1) then
+					if y_count = (Y_SIZE-1) and x_count = (X_SIZE-1) then
 						y_count <= 0;
 					elsif x_count = (X_SIZE-1) then
 						y_count <= y_count + 1;

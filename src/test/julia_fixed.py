@@ -33,7 +33,7 @@ RE_MIN_FIXED = RE_MIN * FIXED_SCALE
 IM_MIN_FIXED = IM_MIN * FIXED_SCALE
 
 # THRESHOLD SCALED AND SQUARED
-THRESHOLD_SQ = (THRESHOLD * FIXED_SCALE) ** 2
+THRESHOLD_SQ = ((THRESHOLD * FIXED_SCALE) ** 2) >> FIXED_BITS
 
 # UTILITY FUNCTIONS
 def fixed_mul(a, b):
@@ -75,6 +75,7 @@ def julia_compute(c_array):
 				# Get Complex coordinate
 				z_re = c_array[y, x][0]
 				z_im = c_array[y, x][1]
+
 
 				# Check if coordinate in julia set
 				iteration = 0
@@ -137,8 +138,29 @@ def test_gen_complex_coord():
 	plt.tight_layout()
 	plt.show()
 
+def test_julia_compute_vhdl():
+	# COMPUTE JULIA FRACTAL
+	c = gen_complex_coord()
+	div = julia_compute(c)
 
+	# GET VHDL JULIA FRACTAL
+	div_vhdl = np.loadtxt("output/julia_output.csv", dtype=np.uint8).reshape((X_SIZE, Y_SIZE))
+
+	# PLOT BOTH IMAGES SIDE BY SIDE
+	fig, axs = plt.subplots(1, 2, figsize=(12, 6))
+
+	axs[0].imshow(div, cmap='cubehelix', extent=(RE_MIN, RE_MAX, IM_MIN, IM_MAX))
+	axs[0].set_title("Python Computation")
+	axs[0].axis('off')
+
+	axs[1].imshow(div_vhdl, cmap='cubehelix', extent=(RE_MIN, RE_MAX, IM_MIN, IM_MAX))
+	axs[1].set_title("VHDL Output Comparison")
+	axs[1].axis('off')
+
+	plt.tight_layout()
+	plt.show()
 
 if __name__ == "__main__":
 	#test_fixed_julia()
-	test_gen_complex_coord()
+	#test_gen_complex_coord()
+	test_julia_compute_vhdl()
