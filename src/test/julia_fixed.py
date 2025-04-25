@@ -37,7 +37,9 @@ THRESHOLD_SQ = ((THRESHOLD * FIXED_SCALE) ** 2) >> FIXED_BITS
 
 # UTILITY FUNCTIONS
 def fixed_mul(a, b):
-	return int(a * b) >> FIXED_BITS
+	a = int(a)
+	b = int(b)
+	return (a * b) >> FIXED_BITS
 
 def save_complex_coord():
 	pass
